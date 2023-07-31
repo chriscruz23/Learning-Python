@@ -2,9 +2,9 @@ from abc import ABC, abstractmethod
 
 
 class Item(ABC):
-    def __init__(self, name: str, description: str, weight=10) -> None:
+    def __init__(self, name: str, desc: str, weight=10) -> None:
         self.name = name
-        self.description = description
+        self.desc = desc
         self.weight = weight
 
     @property
@@ -18,14 +18,14 @@ class Item(ABC):
         self._name = name
 
     @property
-    def description(self) -> str:
-        return self._description
+    def desc(self) -> str:
+        return self._desc
 
-    @description.setter
-    def description(self, description: str) -> None:
-        if len(description) < 1:
+    @desc.setter
+    def desc(self, desc: str) -> None:
+        if not desc:
             raise ValueError("Description cannot be left empty!")
-        self._description = description
+        self._desc = desc
 
     @property
     def weight(self) -> str:
