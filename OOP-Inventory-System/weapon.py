@@ -4,10 +4,10 @@ from item import Item
 
 
 class WeaponType(Enum):
-    SWORD = "Sword"
-    MACE = "Mace"
-    SPEAR = "Spear"
-    BOW = "Bow"
+    blade = "slashes"
+    mace = "crushes"
+    spear = "gouges"
+    bow = "pierces"
 
 
 class Weapon(Item):
@@ -21,19 +21,26 @@ class Weapon(Item):
 
     @w_type.setter
     def w_type(self, w_type: WeaponType) -> None:
-        if not w_type:
-            raise ValueError("Weapon type cannot be left empty!")
-        elif not isinstance(w_type, WeaponType):
+        Weapon.validate_argument(w_type, "weapon type")
+        if not isinstance(w_type, WeaponType):
             raise TypeError("Must be a weapon type!")
         self._w_type = w_type
 
     def examine(self) -> str:
         return f"{self.name} ---- {self.desc}\n \
-            A {self.w_type.name} that {self.w_type.value.value} to cause its damage!"
+            A {self.w_type.name} that {self.w_type.value} to cause its damage!"
 
     def __eq__(self, other: object) -> bool:
         if isinstance(other, Weapon):
             return sorted(self.__dict__) == sorted(other.__dict__)
+
+    def __lt__(self, other: object) -> bool:
+        if isinstance(other, Item):
+            return self.name < other.name
+
+    def __gt__(self, other: object) -> bool:
+        if isinstance(other, Item):
+            return self.name > other.name
 
     def __hash__(self) -> int:
         return hash(tuple(sorted(self.__dict__.items())))
