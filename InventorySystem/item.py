@@ -1,48 +1,56 @@
 from abc import ABC, abstractmethod
+from functools import cached_property
 
 
-class EmptyArgumentError(Exception):
+class EmptyArgumentError(TypeError):
     """Argument not supplied."""
 
     pass
 
 
+class ReadOnlyPropertyError(AttributeError):
+    """Property is read only."""
+
+    pass
+
+
 class Item(ABC):
-    def __init__(self, name: str, desc: str, weight=10) -> None:
-        self.name = name
-        self.desc = desc
-        self.weight = weight
+    def __init__(self, name: str, desc: str, weight: int = 10) -> None:
+        for arg, value in {name: "name", desc: "description", weight: "weight"}.items():
+            self.validate_argument(arg, value)
+        if not isinstance(weight, int):
+            raise ValueError("Must be an integer type!")
+
+        self._name = name
+        self._desc = desc
+        self._weight = weight
 
     @property
     def name(self) -> str:
         return self._name
 
-    @name.setter
-    def name(self, n: str) -> None:
-        self.validate_argument(n, "name")
-        self._name = n
-
     @property
     def desc(self) -> str:
         return self._desc
-
-    @desc.setter
-    def desc(self, d: str) -> None:
-        self.validate_argument(d, "description")
-        self._desc = d
 
     @property
     def weight(self) -> str:
         return self._weight
 
+    @name.setter
+    def name(self, n: str) -> None:
+        raise ReadOnlyPropertyError(f'Cannot change the "name" value.')
+
+    @desc.setter
+    def desc(self, d: str) -> None:
+        raise ReadOnlyPropertyError(f'Cannot change the "description" value.')
+
     @weight.setter
     def weight(self, w: int) -> None:
-        self.validate_argument(w, "weight")
-        if not isinstance(w, int):
-            raise TypeError("Weight must be a whole number!")
-        self._weight = w
+        raise ReadOnlyPropertyError(f'Cannot change the "weight" value.')
 
     @abstractmethod
+    @cached_property
     def examine(self) -> str:
         pass
 
@@ -59,6 +67,7 @@ class Item(ABC):
         pass
 
     @abstractmethod
+    @cached_property
     def __hash__(self) -> int:
         pass
 

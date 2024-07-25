@@ -4,6 +4,10 @@ from item import Item
 
 
 class WeaponType(Enum):
+    @classmethod
+    def items(cls):
+        return [f"WeaponType.{c.name}" for c in cls]
+
     blade = "slashes"
     mace = "crushes"
     spear = "gouges"
@@ -12,8 +16,13 @@ class WeaponType(Enum):
 
 class Weapon(Item):
     def __init__(self, name: str, desc: str, weight: int, w_type: WeaponType) -> None:
+        for arg, value in {w_type: "weapon type"}.items():
+            self.validate_argument(arg, value)
+        if not isinstance(w_type, WeaponType):
+            raise TypeError(f"Must be a weapon type! {WeaponType.items()}")
+
         super().__init__(name, desc, weight)
-        self.w_type = w_type
+        self._w_type = w_type
 
     @property
     def w_type(self) -> WeaponType:
@@ -21,10 +30,7 @@ class Weapon(Item):
 
     @w_type.setter
     def w_type(self, w_type: WeaponType) -> None:
-        Weapon.validate_argument(w_type, "weapon type")
-        if not isinstance(w_type, WeaponType):
-            raise TypeError("Must be a weapon type!")
-        self._w_type = w_type
+        raise Item.ReadOnlyPropertyError(f'Cannot change the "name" value.')
 
     def examine(self) -> str:
         return f"{self.name} ---- {self.desc}\n \
